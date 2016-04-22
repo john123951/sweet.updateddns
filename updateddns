@@ -1,0 +1,29 @@
+#!/bin/bash
+
+checkUrl="http://www.3322.net/dyndns/getip"
+updateUrl="http://sweet123951:password@ddns.oray.com/ph/update?hostname=sweet123951.wicp.net"
+
+IP_FILE="getip"
+LOG_FILE="update.log"
+
+CMD_PATH=`dirname $0`
+IP_PATH=${CMD_PATH}/${IP_FILE}
+LOG_PATH=${CMD_PATH}/${LOG_FILE}
+
+logIP=`cat ${IP_PATH}`
+newIP=`curl ${checkUrl}`
+#echo ${newIP}
+#echo ${logIP}
+
+if [ "$newIP" != "$logIP" ];then
+  updateResp=`curl ${updateUrl}`
+  updateResult=`echo ${updateResp}|awk '{print $1}'`
+  echo ${updateResult}
+  if [ "good" == "$updateResult" -o "nochg" == "$updateResult" ];then
+    echo ${newIP}>${IP_PATH}
+    echo $(date +"%Y-%m-%d %H:%M:%S"): update success, ${updateResp}>>${LOG_PATH}
+  else
+    echo update fail
+  fi
+fi
+
